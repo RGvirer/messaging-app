@@ -4,6 +4,4 @@
 
 [build.environment]
   NODE_VERSION = "20.19.4"
-
-[build.environment.VITE_API_URL]
-  value = "https://messaging-app-ql5h.onrender.com"
+  VITE_API_URL = "https://messaging-app-ql5h.onrender.com"
