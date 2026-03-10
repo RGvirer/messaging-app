@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
+const authenticateJWT = require('../middleware/auth');
 
 // This module exports a function that accepts the socket.io instance so that
 // we can emit events when a message is saved.
@@ -21,7 +22,7 @@ module.exports = (io) => {
   // POST /messages
   // req.user is populated by the JWT authentication middleware;
   // fall back to body.user if for some reason the token is absent.
-  router.post('/', async (req, res) => {
+  router.post('/', authenticateJWT, async (req, res) => {
     const { user: bodyUser, text } = req.body;
     const sender = req.user && req.user.name ? req.user.name : bodyUser;
 
