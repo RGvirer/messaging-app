@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "npx vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -17,8 +17,5 @@
     "vite": "^4.4.9",
     "@vitejs/plugin-react": "^4.0.0"
   },
-  "devDependencies": {
-    "vite": "^4.4.9",
-    "@vitejs/plugin-react": "^4.0.0"
-  }
+  "devDependencies": {}
 }
