@@ -153,15 +153,38 @@ AI was used for:
 
 The development process followed a **Spec Driven Development** approach.
 
-First, specifications were written describing:
+1. **Specification phase:**  
+   - Detailed specifications were written covering:
+     - Product requirements
+     - System architecture
+     - API structure
+   - These specifications served as the blueprint for all subsequent development.
 
-- product requirements
-- system architecture
-- API structure
+2. **AI-assisted implementation:**  
+   - **GitHub Copilot (Agent mode)** was used for:
+     - Writing boilerplate code and repetitive tasks
+     - Generating backend and frontend components based on specs
+     - Accelerating the development workflow while maintaining code consistency
+   - **ChatGPT** was used for:
+     - Debugging and fixing complex issues
+     - Reviewing and improving system architecture decisions
+     - Guidance on best practices and deployment strategies
+     - Troubleshooting integration with external services and servers
 
-AI tools were then used to implement features based on those specifications.
+3. **Impact on development:**  
+   - Reduced development time by automating routine coding tasks
+   - Maintained high code quality and adherence to specifications
+   - Enabled rapid iteration and experimentation with features
+   - Streamlined deployment and integration with external systems
 
-This approach helped accelerate development while keeping the system organized.
+This approach combined structured planning with AI-assisted coding, resulting in an organized, efficient, and high-quality development process.
+
+---
+
+## Notes
+
+- Basic authentication is already implemented using JWT tokens.
+- Google OAuth is available for login.
 
 ---
 
@@ -169,7 +192,6 @@ This approach helped accelerate development while keeping the system organized.
 
 With additional development time, the following improvements could be implemented:
 
-- proper authentication (JWT / OAuth)
 - message history pagination
 - private messages
 - user presence indicators
