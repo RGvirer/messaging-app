@@ -1,8 +1,17 @@
 # Messaging App
 
-A simple real-time messaging application built as part of a technical assignment.
+A real-time messaging application built as part of a technical assignment.
 
-The application allows users to log in with a username and send messages that are visible to all connected users.
+Users can log in with a username or via Google OAuth and send messages that are visible to all connected users.
+
+---
+
+**Live URLs**  
+
+| Environment | URL |
+|------------|-----|
+| Frontend   | [https://rivkis-messaging-application.netlify.app/](https://rivkis-messaging-application.netlify.app/) |
+| Backend    | [https://messaging-app-ql5h.onrender.com](https://messaging-app-ql5h.onrender.com) |
 
 ---
 
@@ -10,7 +19,7 @@ The application allows users to log in with a username and send messages that ar
 
 ### Backend
 
-1. Navigate to the `backend` directory:
+1. Navigate to the backend directory:
    ```bash
    cd backend
    ```
@@ -30,6 +39,8 @@ The application allows users to log in with a username and send messages that ar
    npm run dev    # or npm start for production
    ```
    The backend listens on port 4000 by default.
+   For deployment on Netlify, run:
+   npm run build
 
 ### Frontend
 
@@ -55,6 +66,7 @@ The application allows users to log in with a username and send messages that ar
 You can then open `http://localhost:3000` in your browser to use the chat app.
 
 ---
+
 ## Google OAuth Setup
 
 To enable Google login you need to create credentials in the Google Cloud Console:
@@ -62,7 +74,7 @@ To enable Google login you need to create credentials in the Google Cloud Consol
 1. Create a new OAuth 2.0 Client ID (type "Web application").
 2. Add the following redirect URI to the client configuration:
    ```
-   http://localhost:4000/auth/google/callback
+   https://messaging-app-ql5h.onrender.com/auth/google/callback
    ```
    (or whatever `BACKEND_URL` you are using).
 3. Copy the **Client ID** and **Client Secret**.
@@ -72,7 +84,7 @@ Set the following environment variables in `backend/.env`:
 ```
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-BACKEND_URL=http://localhost:4000   # must match the redirect URI
+BACKEND_URL=https://messaging-app-ql5h.onrender.com   # must match the redirect URI
 FRONTEND_URL=http://localhost:3000
 
 # JWT settings
@@ -90,22 +102,15 @@ includes it in all subsequent API and WebSocket requests.
 
 # Tech Stack
 
-Frontend
-React + Vite
+## Tech Stack
 
-Backend
-Node.js + Express
-
-Database
-MongoDB
-
-Realtime Communication
-Socket.io
-
-Deployment
-Frontend: Vercel  
-Backend: Render / Railway
-
+- Frontend: React + Vite
+- Backend: Node.js + Express
+- Database: MongoDB
+- Realtime Communication: Socket.io
+- Deployment:
+  - Frontend: Netlify
+  - Backend: Render
 ---
 
 # Architecture
@@ -117,6 +122,7 @@ Frontend communicates with the backend using REST APIs.
 Real-time updates are implemented using Socket.io.
 
 When a user sends a message:
+
 1. The frontend sends the message to the backend.
 2. The backend stores the message in MongoDB.
 3. The backend broadcasts the message to all connected clients.
