@@ -6,6 +6,57 @@ The application allows users to log in with a username and send messages that ar
 
 ---
 
+## Getting Started
+
+### Backend
+
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file (you can copy `.env.example`):
+   ```bash
+   cp .env.example .env
+   ```
+   and adjust `MONGO_URI` or `CLIENT_URL` if needed.
+4. Start the server:
+   ```bash
+   npm run dev    # or npm start for production
+   ```
+   The backend listens on port 4000 by default.
+
+### Frontend
+
+1. Navigate to the `frontend` directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Copy the example environment file if you need to override the API URL:
+   ```bash
+   cp .env.example .env
+   ```
+   (Vite requires the `VITE_API_URL` prefix for environment variables.)
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   The frontend runs on port 4000 by default.
+
+You can then open `http://localhost:4000` in your browser to use the chat app.
+
+---
+
+
+---
+
 # Tech Stack
 
 Frontend

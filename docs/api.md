@@ -2,27 +2,16 @@
 
 ## Base URL
 
-/api
+The server is mounted at the root path (`/`).
+(The earlier draft mentioned `/api`; the current implementation uses `/messages` directly.)
 
 ---
 
 ## Login
 
-### POST /login
-
-Allows a user to log in using a username.
-
-Request:
-
-{
-  "username": "string"
-}
-
-Response:
-
-{
-  "username": "string"
-}
+The frontend handles authentication entirely in the browser. There is no server-side
+login endpoint in this simple version; the username is stored in `localStorage` and
+included with every message.
 
 ---
 
