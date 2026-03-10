@@ -41,11 +41,28 @@ function Chat() {
   }
 
   useEffect(() => {
-    if (!user) return;
+    if (!token || !user) {
+      navigate('/login');
+      return;
+    }
+
+    // fetch initial batch of messages
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/messages`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMessages(res.data.reverse());
+      } catch (err) {
+        console.error('Failed to load messages', err);
+        setError('Failed to load messages');
+      }
+    };
+
+    fetchMessages();
 
     socketRef.current = io(API_URL, {
-      auth: { token: localStorage.getItem("token") },
-      withCredentials: true,
+      auth: { token },
     });
 
     socketRef.current.on("new_message", (msg) => {
@@ -55,7 +72,7 @@ function Chat() {
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [user]);
+  }, [navigate, token, user]);
 
   const sendMessage = () => {
     if (!user) return; // ודאי שהמשתמש מזוהה
@@ -71,19 +88,20 @@ function Chat() {
     axios
       .post(
         `${API_URL}/messages`,
-        { user: user.name, text: trimmed },
+        { text: trimmed },
         {
-          headers: { Authorization: `Bearer ${token}` }, // שולחים Authorization header
-        },
+          headers: { Authorization: `Bearer ${token}` },
+        }
       )
       .then((res) => {
-        setMessages((prev) => [...prev, res.data]); // מעדכנים את ההודעות במסך
-        setText(""); // מנקים את השדה
+        // server broadcasts, but add to list optimistically
+        setMessages((prev) => [...prev, res.data]);
+        setText("");
         setError("");
       })
       .catch((err) => {
         console.error(err.response || err);
-        setError("Failed to send message"); // אם נכשל
+        setError("Failed to send message");
       });
   };
 
