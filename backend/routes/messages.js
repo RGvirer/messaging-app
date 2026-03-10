@@ -19,9 +19,13 @@ module.exports = (io) => {
   });
 
   // POST /messages
+  // req.user is populated by the JWT authentication middleware;
+  // fall back to body.user if for some reason the token is absent.
   router.post('/', async (req, res) => {
-    const { user, text } = req.body;
-    if (!user || !text || !text.trim()) {
+    const { user: bodyUser, text } = req.body;
+    const sender = req.user && req.user.name ? req.user.name : bodyUser;
+
+    if (!sender || !text || !text.trim()) {
       return res.status(400).json({ error: 'Invalid message' });
     }
     if (text.length > 1000) {
@@ -29,7 +33,8 @@ module.exports = (io) => {
     }
 
     try {
-      const msg = new Message({ user, text: text.trim() });
+      const avatar = req.user && req.user.avatar ? req.user.avatar : undefined;
+      const msg = new Message({ user: sender, avatar, text: text.trim() });
       const saved = await msg.save();
       // broadcast to all connected clients
       io.emit('new_message', saved);

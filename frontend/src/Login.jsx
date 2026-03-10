@@ -1,40 +1,44 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import jwtDecode from 'jwt-decode';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const trimmed = username.trim();
-    if (!trimmed) {
-      setError('Username cannot be empty');
-      return;
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (token) {
+    try {
+      const payload = jwtDecode(token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify({
+        name: payload.name,
+        email: payload.email,
+        avatar: payload.avatar
+      }));
+    } catch (e) {
+      console.error('Invalid token', e);
     }
-    if (trimmed.length > 20) {
-      setError('Username must be 20 characters or less');
-      return;
-    }
-    localStorage.setItem('username', trimmed);
-    navigate('/chat');
+    navigate('/chat', { replace: true });
+    return;
+  }
+
+  if (localStorage.getItem('token')) {
+    navigate('/chat', { replace: true });
+  }
+}, [navigate]);
+
+  const handleGoogle = () => {
+    window.location = `${API_URL}/auth/google`;
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Enter username"
-        />
-        <br />
-        <button type="submit">Enter</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <button onClick={handleGoogle}>Sign in with Google</button>
     </div>
   );
 }

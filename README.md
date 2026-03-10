@@ -14,7 +14,7 @@ The application allows users to log in with a username and send messages that ar
    ```bash
    cd backend
    ```
-2. Install dependencies:
+2. Install dependencies (new OAuth packages were added):
    ```bash
    npm install
    ```
@@ -22,8 +22,10 @@ The application allows users to log in with a username and send messages that ar
    ```bash
    cp .env.example .env
    ```
-   and adjust `MONGO_URI` or `CLIENT_URL` if needed.
-4. Start the server:
+   and adjust `MONGO_URI`, `FRONTEND_URL` or other values as needed.
+4. (Optional) if you're enabling Google login, update the OAuth values described
+   below.
+5. Start the server:
    ```bash
    npm run dev    # or npm start for production
    ```
@@ -48,12 +50,41 @@ The application allows users to log in with a username and send messages that ar
    ```bash
    npm run dev
    ```
-   The frontend runs on port 4000 by default.
+   The frontend runs on port 3000 by default.
 
-You can then open `http://localhost:4000` in your browser to use the chat app.
+You can then open `http://localhost:3000` in your browser to use the chat app.
 
 ---
+## Google OAuth Setup
 
+To enable Google login you need to create credentials in the Google Cloud Console:
+
+1. Create a new OAuth 2.0 Client ID (type "Web application").
+2. Add the following redirect URI to the client configuration:
+   ```
+   http://localhost:4000/auth/google/callback
+   ```
+   (or whatever `BACKEND_URL` you are using).
+3. Copy the **Client ID** and **Client Secret**.
+
+Set the following environment variables in `backend/.env`:
+
+```
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+BACKEND_URL=http://localhost:4000   # must match the redirect URI
+FRONTEND_URL=http://localhost:3000
+
+# JWT settings
+JWT_SECRET=a_long_random_string
+JWT_EXPIRES_IN=1h               # token lifetime
+```
+
+After restarting the backend, clicking the "Sign in with Google" button on the login page
+will start the OAuth flow. On success the backend will save the user to MongoDB, create a
+JSON Web Token containing the user's profile, and redirect the browser to `/chat?token=…`.
+The frontend reads the token from the query string, stores it in `localStorage`, and
+includes it in all subsequent API and WebSocket requests.
 
 ---
 

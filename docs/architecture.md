@@ -14,7 +14,7 @@ The system follows a **client-server architecture** with real-time communication
 React + Vite
 
 Responsibilities:
-- Login screen
+- Login screen (now using Google OAuth)
 - Display message list
 - Send new messages
 - Listen for real-time updates
@@ -75,10 +75,15 @@ Clients
 
 ## Authentication Flow
 
-1. User enters a username in the login screen.
-2. Username is stored in localStorage.
-3. User is redirected to the chat page.
-4. Messages sent by the user include the username.
+1. User clicks "Sign in with Google" on the login screen.
+2. Browser is redirected to the backend's `/auth/google` endpoint.
+3. Backend uses Passport with Google OAuth2 to verify the user and store or
+   retrieve the profile from MongoDB.
+4. On successful login the backend returns a small HTML snippet that stores the
+   profile ({name,email,avatar}) in `localStorage` and then redirects to `/chat`.
+5. Logged-in clients include their display name when posting messages; the
+   backend will also read the session cookie and ignore any falsified user
+   field.
 
 ---
 

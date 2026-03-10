@@ -29,12 +29,13 @@ User is not authenticated.
 ## Main Flow
 
 1. User opens the application.
-2. System displays login screen.
-3. User enters username.
-4. User presses "Enter".
-5. Frontend stores username in localStorage.
-6. User is redirected to chat page.
-7. Username is used for all messages sent by the user.
+2. System displays login screen with a "Sign in with Google" button.
+3. User clicks the button and is redirected to Google's OAuth consent page.
+4. After granting permission, Google redirects back to the backend callback.
+5. Backend verifies the token and creates or fetches a user record in MongoDB.
+6. Backend returns a small script that stores the profile in localStorage.
+7. Browser is redirected to the chat page.
+8. Username (from Google profile) is used for all messages sent by the user.
 
 ---
 

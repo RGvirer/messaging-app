@@ -21,18 +21,20 @@ Message
 Fields
 
 id
-user
+user (string - display name)
+avatar (optional string - URL to avatar image)
 text
 createdAt
 
 ---
 
 ## Main Flow: Send Message
-
-1. User types a message in the input field.
+1. Authenticated user (profile stored in localStorage) types a message in the input field.
 2. User presses the send button.
-3. Frontend sends POST request to /messages.
-4. Backend validates message.
+3. Frontend sends POST request to /messages; the backend may also read the session cookie to
+   determine the sender.
+4. Backend validates message and the sender information.
+5. Backend saves message (including optional avatar) in database.
 5. Backend saves message in database.
 6. Backend emits a "new_message" event via Socket.io.
 7. All connected clients receive the event.
