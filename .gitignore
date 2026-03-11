@@ -12,7 +12,9 @@ yarn-error.log*
 # Environment files
 .env
 backend/.env
+backend/.env.local
 frontend/.env
+frontend/.env.development
 
 # Build output
 dist/

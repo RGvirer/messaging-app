@@ -1,9 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global overrides */
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+  /* use an easy-to-read system font */
+  @apply m-0 font-sans bg-neutral text-gray-900 antialiased;
 }
 
-input, button {
-  padding: 8px;
-  margin: 4px 0;
+img {
+  @apply block max-w-full;
 }

@@ -48,10 +48,16 @@ Users can log in with a username or via Google OAuth and send messages that are 
    ```bash
    cd frontend
    ```
-2. Install dependencies:
+2. Install dependencies (the UI now uses Tailwind CSS):
    ```bash
    npm install
    ```
+   If Tailwind packages were not pulled automatically, run:
+   ```bash
+   npm install -D tailwindcss postcss autoprefixer
+   npx tailwindcss init -p
+   ```
+   The workspace already contains a `tailwind.config.js` and `postcss.config.js`.
 3. Copy the example environment file if you need to override the API URL:
    ```bash
    cp .env.example .env
@@ -64,6 +70,9 @@ Users can log in with a username or via Google OAuth and send messages that are 
    The frontend runs on port 3000 by default.
 
 You can then open `http://localhost:3000` in your browser to use the chat app.
+
+> **UI redesign:**
+> The application now features a modern SaaS-style layout with a gradient login screen, polished chat interface, and responsive components built with Tailwind CSS. The code has been refactored into reusable React functional components for maintainability.
 
 ---
 

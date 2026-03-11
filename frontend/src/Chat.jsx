@@ -4,30 +4,32 @@ import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
+// ui components
+import Header from "./components/Header";
+import MessageBubble from "./components/MessageBubble";
+import ChatInput from "./components/ChatInput";
+import Layout from "./components/Layout";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 axios.defaults.withCredentials = true;
-
-// attach token header for all requests
-const token = localStorage.getItem("token");
-if (token) {
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-}
 
 function Chat() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const socketRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
-  const storedToken = localStorage.getItem("token");
+  // Load token once
+  const token = localStorage.getItem("token");
   let user = null;
-  if (storedToken) {
+  if (token) {
     try {
-      const payload = jwtDecode(storedToken);
-      // check expiration
+      const payload = jwtDecode(token);
       if (payload.exp * 1000 < Date.now()) {
         localStorage.removeItem("token");
+        navigate('/login');
       } else {
         user = {
           name: payload.name,
@@ -37,45 +39,45 @@ function Chat() {
       }
     } catch {
       localStorage.removeItem("token");
+      navigate('/login');
     }
+  } else {
+    navigate('/login');
   }
 
+  // Fetch messages once and setup socket once
   useEffect(() => {
-    if (!token || !user) {
-      navigate('/login');
-      return;
-    }
+    if (!token || !user) return;
 
-    // fetch initial batch of messages
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`${API_URL}/messages`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(`${API_URL}/messages`);
         setMessages(res.data.reverse());
       } catch (err) {
-        console.error('Failed to load messages', err);
-        setError('Failed to load messages');
+        console.error("Failed to load messages", err);
+        setError("Failed to load messages");
       }
     };
 
     fetchMessages();
 
-    socketRef.current = io(API_URL, {
-      auth: { token },
-    });
+    socketRef.current = io(API_URL, { auth: { token } });
 
-    socketRef.current.on("new_message", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-    });
+    socketRef.current.on("connect", () => console.log("Socket connected:", socketRef.current.id));
+    socketRef.current.on("disconnect", (reason) => console.log("Socket disconnected:", reason));
+    socketRef.current.on("new_message", (msg) => setMessages((prev) => [...prev, msg]));
 
-    return () => {
-      socketRef.current?.disconnect();
-    };
-  }, [navigate, token, user]);
+    return () => socketRef.current?.disconnect();
+  }, [token]); // token should not change during session
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = () => {
-    if (!user) return; // ודאי שהמשתמש מזוהה
+    if (!user) return;
     const trimmed = text.trim();
     if (!trimmed) return;
     if (trimmed.length > 500) {
@@ -83,18 +85,9 @@ function Chat() {
       return;
     }
 
-    const token = localStorage.getItem("token"); // קבלי את הטוקן מה־localStorage
-
     axios
-      .post(
-        `${API_URL}/messages`,
-        { text: trimmed },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      )
+      .post(`${API_URL}/messages`, { text: trimmed })
       .then((res) => {
-        // server broadcasts, but add to list optimistically
         setMessages((prev) => [...prev, res.data]);
         setText("");
         setError("");
@@ -105,88 +98,30 @@ function Chat() {
       });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    sendMessage();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate('/login');
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Chat</h1>
-      {user && (
-        <div
-          style={{
-            marginBottom: "10px",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {user.avatar && (
-            <img
-              src={user.avatar}
-              alt="me"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                marginRight: 8,
-              }}
-            />
-          )}
-          <span>Welcome, {user.name}</span>
-        </div>
-      )}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div
-        style={{
-          maxHeight: "400px",
-          overflowY: "auto",
-          border: "1px solid #ccc",
-          padding: "8px",
-        }}
-      >
+    <Layout className="h-screen bg-neutral">
+      <Header user={user} onLogout={handleLogout} />
+
+      {error && <div className="text-center text-red-600 py-2">{error}</div>}
+
+      <div className="flex-1 overflow-auto p-4 space-y-2 scroll-smooth">
+        {messages.length === 0 && (
+          <p className="text-center text-gray-500 mt-10">No messages yet. Say hello! 👋</p>
+        )}
         {messages.map((m, idx) => (
-          <div
-            key={idx}
-            style={{
-              marginBottom: "8px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {m.avatar && (
-              <img
-                src={m.avatar}
-                alt="avatar"
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  marginRight: 8,
-                }}
-              />
-            )}
-            <div>
-              <strong>{m.user}: </strong>
-              <span>{m.text}</span>
-              <div style={{ fontSize: "0.7em", color: "#999" }}>
-                {new Date(m.createdAt).toLocaleTimeString()}
-              </div>
-            </div>
-          </div>
+          <MessageBubble key={idx} message={m} isOwn={user && m.user === user.name} />
         ))}
+        <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={handleSubmit} style={{ marginTop: "10px" }}>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message"
-          style={{ width: "80%" }}
-        />
-        <button type="submit">Send</button>
-      </form>
-    </div>
+
+      <ChatInput text={text} setText={setText} onSend={sendMessage} />
+    </Layout>
   );
 }
 
